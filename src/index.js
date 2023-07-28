@@ -1,17 +1,63 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM  from "react-dom";
+import Geo from "./geo";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+//class component kullanımı function kullanıma göre daha complex yerlerde kullanılır
+//state yapısı yalnızca class based componentlerde kullanılır
+//
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+class App extends React.Component{
+
+
+
+   
+
+        state = {latitude:null,errorMesssage:"", longitude:null,};
+
+
+        //constructor da kullanılabilir componentDidMount da
+        componentDidMount(props){
+        window.navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.setState({latitude: position.coords.latitude})
+                this.setState({longitude: position.coords.longitude})
+            },
+            
+            (error)=> {
+
+                this.setState({errorMesssage: error.message})
+            })
+        }
+
+        render(){
+            if(!this.state.errorMesssage && this.state.latitude && this.state.longitude)
+                    {
+                      return(  <div>
+                        <Geo latitude= {this.state.latitude} longitude={this.state.longitude} />
+                        </div> )
+                    }
+
+            if(this.state.errorMesssage && ( !this.state.latitude || this.state.longitude))
+                    {
+                      return( <div><Geo errorMessage={this.state.errorMesssage}/></div>)
+                    }
+
+            if(!this.state.errorMesssage && (!this.state.latitude || this.state.longitude) )
+                    {
+                        return(  <div>Loading</div> )
+                    }
+
+
+        }
+
+    }
+
+    export default App;
+
+    
+
+ReactDOM.render(
+
+    <App />,
+    document.querySelector("#root")
+)
